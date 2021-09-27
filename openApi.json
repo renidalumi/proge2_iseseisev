@@ -1,0 +1,1013 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+      "title": "Excuses API",
+      "version": "0.1.0"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000/"
+      }
+    ],
+    "components": {
+      "schemas": {
+        "id": {
+          "type": "number",
+          "description": "Resource id",
+          "additionalProperties": false,
+          "example": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Resource description",
+          "additionalProperties": false
+        },
+        "name": {
+          "type": "string",
+          "description": "Resource name",
+          "additionalProperties": false
+        },
+        "firstName": {
+          "type": "string",
+          "example": "Kati"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Karu"
+        },
+        "visibility": {
+          "type": "string",
+          "example": "Public"
+        },
+        "user": {
+          "type": "object",
+          "description": "User object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "firstName": {
+              "$ref": "#/components/schemas/firstName"
+            },
+            "lastName": {
+              "$ref": "#/components/schemas/lastName"
+            }
+          }
+        },
+        "category": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "name": {
+              "$ref": "#/components/schemas/name"
+            },
+            "createdBy": {
+              "$ref": "#/components/schemas/id"
+            }
+          }
+        },
+        "excuse": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/components/schemas/id"
+            },
+            "description": {
+              "$ref": "#/components/schemas/description"
+            },
+            "createdBy": {
+              "$ref": "#/components/schemas/id"
+            },
+            "category": {
+              "$ref": "#/components/schemas/id"
+            },
+            "visibility": {
+              "$ref": "#/components/schemas/visibility"
+            }
+          }
+        }
+      }
+    },
+    "paths": {
+      "/ping": {
+        "get": {
+          "tags": [
+            "General operations"
+          ],
+          "description": "Endpoint for testing if API is operational",
+          "responses": {
+            "200": {
+              "description": "Alive message",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Alive"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users": {
+        "get": {
+          "tags": [
+            "Users operations"
+          ],
+          "description": "Returns list of users",
+          "responses": {
+            "200": {
+              "description": "List of users",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "users": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/user"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Users operations"
+          ],
+          "description": "Create new user",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "firstName": {
+                      "$ref": "#/components/schemas/firstName"
+                    },
+                    "lastName": {
+                      "$ref": "#/components/schemas/lastName"
+                    }
+                  }
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "description": "User created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "$ref": "#/components/schemas/id"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Required data is missing",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "No first name": {
+                      "value": {
+                        "error": "First name is required"
+                      }
+                    },
+                    "No last name": {
+                      "value": {
+                        "error": "Last name is required"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users/{id}": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Users id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Users operations"
+          ],
+          "description": "Returns user",
+          "responses": {
+            "200": {
+              "description": "User",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "user": {
+                        "$ref": "#/components/schemas/user"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No user found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No user found": {
+                      "value": {
+                        "error": "No user found with id: {id}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "Users operations"
+          ],
+          "description": "Delete user",
+          "responses": {
+            "204": {
+              "description": "User deleted",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No user found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No user found": {
+                      "value": {
+                        "error": "No user found with id: {id}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "Users operations"
+          ],
+          "description": "Update user",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "firstName": {
+                      "$ref": "#/components/schemas/firstName"
+                    },
+                    "lastName": {
+                      "$ref": "#/components/schemas/lastName"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "User updated",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No user found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No user found": {
+                      "value": {
+                        "error": "No user found with id: {id}"
+                      }
+                    },
+                    "Nothing to update": {
+                      "value": {
+                        "error": "Nothing to update"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/categories": {
+        "get": {
+          "tags": [
+            "Categories operations"
+          ],
+          "description": "Returns list of categories",
+          "responses": {
+            "200": {
+              "description": "List of categories",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "categories": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/category"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Categories operations"
+          ],
+          "description": "Create new category",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "$ref": "#/components/schemas/name"
+                    },
+                    "createdBy": {
+                      "$ref": "#/components/schemas/id"
+                    }
+                  }
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "description": "Category created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "$ref": "#/components/schemas/id"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Required data is missing",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "No category name": {
+                      "value": {
+                        "error": "Category name is required"
+                      }
+                    },
+                    "No created by": {
+                      "value": {
+                        "error": "Created by id is required"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/categories/{id}": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Category id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Categories operations"
+          ],
+          "description": "Returns category",
+          "responses": {
+            "200": {
+              "description": "Category",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "category": {
+                        "$ref": "#/components/schemas/category"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No category found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No category found": {
+                      "value": {
+                        "error": "No category found with id: {id}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "Categories operations"
+          ],
+          "description": "Delete category",
+          "responses": {
+            "204": {
+              "description": "Category deleted",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No category found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No category found": {
+                      "value": {
+                        "error": "No category found with id: {id}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "Categories operations"
+          ],
+          "description": "Update category",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "$ref": "#/components/schemas/name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "Category updated",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No category found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No category found": {
+                      "value": {
+                        "error": "No category found with id: {id}"
+                      }
+                    },
+                    "Nothing to update": {
+                      "value": {
+                        "error": "Nothing to update"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/excuses": {
+        "get": {
+          "tags": [
+            "Excuses operations"
+          ],
+          "description": "Returns list of excuses",
+          "parameters": [
+            {
+              "name": "category",
+              "in": "query",
+              "description": "Category string",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "List of excuses",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "excuses": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/excuse"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No excuses found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "No category found": {
+                      "value": {
+                        "error": "No ${category} found"
+                      }
+                    },
+                    "No excuses found in category": {
+                      "value": {
+                        "error": "No excuses found in ${category}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Excuses operations"
+          ],
+          "description": "Create new excuse",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "$ref": "#/components/schemas/description"
+                    },
+                    "category": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "createdBy": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "visibility": {
+                      "$ref": "#/components/schemas/visibility"
+                    }
+                  }
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "201": {
+              "description": "Excuse created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "$ref": "#/components/schemas/id"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Required data is missing",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "No excuse description": {
+                      "value": {
+                        "error": "Excuse description is required"
+                      }
+                    },
+                    "No created by": {
+                      "value": {
+                        "error": "Created by id is required"
+                      }
+                    },
+                    "No category id": {
+                      "value": {
+                        "error": "Category id is required"
+                      }
+                    },
+                    "No visibility": {
+                      "value": {
+                        "error": "Visibility is required"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/excuses/{id}": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Excuse id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "get": {
+          "tags": [
+            "Excuses operations"
+          ],
+          "description": "Returns excuse",
+          "responses": {
+            "200": {
+              "description": "Excuse",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "excuse": {
+                        "$ref": "#/components/schemas/excuse"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No excuse found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No excuse found": {
+                      "value": {
+                        "error": "No excuse found with id: {id}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": [
+            "Excuses operations"
+          ],
+          "description": "Delete excuse",
+          "responses": {
+            "204": {
+              "description": "Excuse deleted",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No excuse found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No excuse found": {
+                      "value": {
+                        "error": "No excuse found with id: {id}"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "patch": {
+          "tags": [
+            "Excuses operations"
+          ],
+          "description": "Update excuse",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "$ref": "#/components/schemas/description"
+                    },
+                    "category": {
+                      "$ref": "#/components/schemas/id"
+                    },
+                    "visibility": {
+                      "$ref": "#/components/schemas/visibility"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "204": {
+              "description": "Excuse updated",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No excuse found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "Invalid id": {
+                      "value": {
+                        "error": "No valid id provided"
+                      }
+                    },
+                    "No excuse found": {
+                      "value": {
+                        "error": "No excuse found with id: {id}"
+                      }
+                    },
+                    "Nothing to update": {
+                      "value": {
+                        "error": "Nothing to update"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/excuses/random": {
+        "get": {
+          "tags": [
+            "Excuses operations"
+          ],
+          "description": "Returns random excuse",
+          "responses": {
+            "200": {
+              "description": "Random excuse",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "excuse": {
+                        "$ref": "#/components/schemas/excuse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
